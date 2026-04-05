@@ -25,7 +25,6 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: "Poppins",
         scaffoldBackgroundColor: Colors.white,
-        // appBarTheme:
       ),
       home: const HomeScreen(),
     );

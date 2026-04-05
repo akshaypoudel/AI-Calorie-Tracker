@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Constants {
   static final String API_KEY = dotenv.env['API_KEY'] ?? '';
+  static final String API_KEY2 = dotenv.env['API_KEY2'] ?? '';
 
   static final String BANNER_AD_ID = dotenv.env['BANNER_AD_ID'] ?? '';
   static final String INTERESTIAL_AD_ID = dotenv.env['INTERESTIAL_AD_ID'] ?? '';

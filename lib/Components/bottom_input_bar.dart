@@ -36,7 +36,6 @@ class BottomInputBarState extends State<BottomInputBar> {
     if (_inputController.text.isEmpty) return;
 
     setState(() => loading = true);
-    _inputController.clear();
 
     final Map<String, dynamic> result = await AIFoodService.analyzeFood(
       _inputController.text,
@@ -44,7 +43,7 @@ class BottomInputBarState extends State<BottomInputBar> {
 
     widget.onResult(_inputController.text, result);
 
-    // _inputController.clear();
+    _inputController.clear();
     setState(() => loading = false);
   }
 
@@ -69,7 +68,7 @@ class BottomInputBarState extends State<BottomInputBar> {
 
             // subtle border instead of shadow
             border: Border.all(
-              color: Colors.orange.withOpacity(0.25),
+              color: const Color.fromARGB(255, 0, 0, 0),
               width: 1.2,
             ),
           ),
@@ -82,7 +81,9 @@ class BottomInputBarState extends State<BottomInputBar> {
                   style: const TextStyle(fontSize: 15),
                   decoration: InputDecoration(
                     hintText: "What did you eat or exercise?",
-                    hintStyle: TextStyle(color: Colors.orange.shade300),
+                    hintStyle: TextStyle(
+                      color: const Color.fromARGB(255, 0, 0, 0),
+                    ),
                     border: InputBorder.none,
                   ),
                 ),
@@ -95,10 +96,13 @@ class BottomInputBarState extends State<BottomInputBar> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.orange.shade400,
+                          color: const Color.fromARGB(255, 0, 0, 0),
                         ),
                       )
-                    : Icon(Icons.send_rounded, color: Colors.orange.shade600),
+                    : Icon(
+                        Icons.send_rounded,
+                        color: const Color.fromARGB(255, 0, 0, 0),
+                      ),
                 onPressed: loading ? null : _send,
               ),
             ],

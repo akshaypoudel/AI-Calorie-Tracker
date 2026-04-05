@@ -1,11 +1,13 @@
+import 'dart:developer';
+
 import 'package:ai_calorie_counter/Components/card_wrapper.dart';
 import 'package:ai_calorie_counter/models/water_intake.dart';
 import 'package:ai_calorie_counter/repository/app_repository.dart';
 import 'package:flutter/material.dart';
 
 class WaterCard extends StatefulWidget {
-  const WaterCard({super.key});
-
+  const WaterCard({super.key, required this.selectedDate});
+  final DateTime selectedDate;
   @override
   State<WaterCard> createState() => WaterCardState();
 }
@@ -21,7 +23,19 @@ class WaterCardState extends State<WaterCard> {
   @override
   void initState() {
     super.initState();
-    // loadTodayData();
+    log('water date ------ ${widget.selectedDate}');
+    loadData();
+  }
+
+  @override
+  void didUpdateWidget(covariant WaterCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.selectedDate != widget.selectedDate) {
+      log('Date changed → reload water data');
+
+      loadData(); // 🔥 THIS is the fix
+    }
   }
 
   void _toggleExpanded() {
@@ -46,16 +60,26 @@ class WaterCardState extends State<WaterCard> {
     }
   }
 
-  // Future<void> loadTodayData() async {
-  //   final intake = await _repo._getTodayIntake();
-  //   if (intake != null) {
-  //     setState(() => cups = intake.cups);
-  //   }
-  // }
+  Future<void> loadData() async {
+    final date = widget.selectedDate.toIso8601String().split('T')[0];
+
+    final intake = await _repo.getWaterIntake(date);
+
+    if (intake != null) {
+      setState(() {
+        cups = intake.cups;
+      });
+    } else {
+      setState(() {
+        cups = 0;
+      });
+    }
+  }
 
   Future<void> saveData() async {
-    final today = DateTime.now().toIso8601String().split('T')[0];
-    final intake = WaterIntake(date: today, cups: cups);
+    // final today = DateTime.now().toIso8601String().split('T')[0];
+    final date = widget.selectedDate.toIso8601String().split('T')[0];
+    final intake = WaterIntake(date: date, cups: cups);
     await _repo.saveWaterIntake(intake);
   }
 

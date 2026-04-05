@@ -5,23 +5,23 @@ import 'package:http/http.dart' as http;
 
 class AIFoodService {
   static Future<Map<String, dynamic>> analyzeFood(String input) async {
-    final url =
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${Constants.API_KEY}";
+    final url = "https://api.groq.com/openai/v1/chat/completions";
 
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "contents": [
-          {
-            "parts": [
-              {
-                "text":
-                    '''
-Analyze the input and return ONLY valid JSON.
-
-Input: $input
-
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          "Authorization": "Bearer ${Constants.API_KEY2}",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "model": "llama-3.1-8b-instant",
+          "messages": [
+            {
+              "role": "system",
+              "content":
+                  '''You are a nutrition assistant. Extract food items and return calories and macros in a clean JSON format.
+                  
 If the input is FOOD, return:
 {
   "type": "meal",
@@ -52,24 +52,33 @@ If the input is EXERCISE, return:
 
 Only JSON.
 No explanation.
-No markdown.
+No markdown.''',
+            },
+            {"role": "user", "content": input},
+          ],
+          "temperature": 0.2,
+        }),
+      );
 
-                ''',
-              },
-            ],
-          },
-        ],
-      }),
-    );
+      // final data = jsonDecode(response.body);
+      // log("Gemini response: $data");
 
-    final data = jsonDecode(response.body);
-    log("Gemini response: $data");
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
 
-    try {
-      final text = data["candidates"][0]["content"]["parts"][0]["text"];
-      return jsonDecode(text);
+        final content = data['choices'][0]['message']['content'];
+        final cleaned = content
+            .replaceAll("```json", "")
+            .replaceAll("```", "")
+            .trim();
+
+        return jsonDecode(cleaned);
+      } else {
+        log('this is a error in the API Call............');
+        throw Exception("Groq API error: ${response.body}");
+      }
     } catch (e) {
-      return {};
+      throw Exception("Groq failed: $e");
     }
   }
 }

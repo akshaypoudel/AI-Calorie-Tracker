@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:ai_calorie_counter/models/ai_log_entry.dart';
 import 'package:ai_calorie_counter/models/weight_entry.dart';
@@ -56,15 +57,21 @@ class AppRepository {
     );
   }
 
-  Future<WaterIntake?> getTodayIntake(String date) async {
+  Future<WaterIntake?> getWaterIntake(String date) async {
     final db = await DatabaseHelper().database;
-    final today = DateTime.now().toIso8601String().split('T')[0]; // YYYY-MM-DD
-    final List<Map<String, dynamic>> maps = await db.query(
+
+    final maps = await db.query(
       'water_intake',
       where: 'date = ?',
-      whereArgs: [today],
+      whereArgs: [date],
     );
+
     if (maps.isEmpty) return null;
+
+    if (maps.length > 1) {
+      log("⚠️ Duplicate entries for date: $date");
+    }
+
     return WaterIntake.fromMap(maps.first);
   }
 

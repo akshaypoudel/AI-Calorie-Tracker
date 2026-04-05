@@ -1,3 +1,4 @@
+import 'package:ai_calorie_counter/Components/app_drawer.dart';
 import 'package:ai_calorie_counter/Components/daily_summary_card.dart';
 import 'package:ai_calorie_counter/Components/food_log_card.dart';
 import 'package:ai_calorie_counter/Components/bottom_input_bar.dart';
@@ -32,6 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _loadBannerAd();
     _loadMeals();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   /// Loads a banner ad.
@@ -175,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
         totals["exerciseCalories"]!;
 
     return Scaffold(
-      drawer: Drawer(),
+      drawer: AppDrawer(),
       appBar: AppBar(
         title: Column(
           children: [
@@ -253,19 +260,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     const SizedBox(height: 5),
-                    const WaterCard(),
+                    WaterCard(selectedDate: selectedDate),
                     const SizedBox(height: 5),
                     ...entriesForSelectedDay.map((e) => FoodLogCard(entry: e)),
                   ],
                 ),
               ),
               const SizedBox(height: 10),
-              if (_bannerAd != null)
-                SizedBox(
-                  height: widget.adSize.height.toDouble(),
-                  width: double.infinity,
-                  child: AdWidget(ad: _bannerAd!),
-                ),
 
               BottomInputBar(
                 onResult: (input, result) async {
@@ -282,6 +283,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 },
               ),
+              if (_bannerAd != null)
+                SizedBox(
+                  height: widget.adSize.height.toDouble(),
+                  width: double.infinity,
+                  child: AdWidget(ad: _bannerAd!),
+                ),
             ],
           ),
         ),
