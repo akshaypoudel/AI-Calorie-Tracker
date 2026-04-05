@@ -16,6 +16,7 @@ dependencies:
   path: ^1.9.1
   http: ^1.6.0
   google_mobile_ads: ^7.0.0
+  flutter_dotenv: ^6.0.0
 
 
 dev_dependencies:

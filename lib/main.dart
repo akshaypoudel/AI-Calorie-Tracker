@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:ai_calorie_counter/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(MobileAds.instance.initialize());
+  await dotenv.load(fileName: ".env");
 
   runApp(const MyApp());
 }

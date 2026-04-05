@@ -1,10 +1,11 @@
-class Constants {
-  static const String API_KEY = "AIzaSyBbMqF7FM8B13ZMgHnokgGgV6XJ6eInJ44";
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-  static const String BANNER_AD_ID = "ca-app-pub-3940256099942544/6300978111";
-  static const String INTERESTIAL_AD_ID =
-      "ca-app-pub-3940256099942544/1033173712";
-  static const String REWARD_AD_ID = "ca-app-pub-3940256099942544/5224354917";
+class Constants {
+  static final String API_KEY = dotenv.env['API_KEY'] ?? '';
+
+  static final String BANNER_AD_ID = dotenv.env['BANNER_AD_ID'] ?? '';
+  static final String INTERESTIAL_AD_ID = dotenv.env['INTERESTIAL_AD_ID'] ?? '';
+  static final String REWARD_AD_ID = dotenv.env['REWARD_AD_ID'] ?? '';
 
   static double _dailyCalories = 2100;
   static double _dailyFat = 60;
