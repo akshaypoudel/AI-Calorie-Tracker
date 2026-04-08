@@ -7,46 +7,6 @@ import 'package:sqflite/sqflite.dart';
 import '../services/database_helper.dart';
 import '../models/water_intake.dart';
 
-extension WeightMethods on AppRepository {
-  Future<void> deleteWeightEntry(WeightEntry entry) async {
-    final db = await DatabaseHelper().database;
-
-    await db.delete(
-      'weight_entries',
-      where: 'date = ?',
-      whereArgs: [entry.date.millisecondsSinceEpoch],
-    );
-  }
-
-  Future<void> updateWeightEntry(WeightEntry entry, double newWeight) async {
-    final db = await DatabaseHelper().database;
-
-    await db.update(
-      'weight_entries',
-      {'weight': newWeight},
-      where: 'date = ?',
-      whereArgs: [entry.date.millisecondsSinceEpoch],
-    );
-  }
-
-  Future<void> saveWeightEntry(WeightEntry entry) async {
-    final db = await DatabaseHelper().database;
-    await db.insert('weight_entries', {
-      'weight': entry.weight,
-      'date': entry.date.millisecondsSinceEpoch,
-    }, conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  Future<List<WeightEntry>> getAllWeightEntries() async {
-    final db = await DatabaseHelper().database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'weight_entries',
-      orderBy: 'date DESC',
-    ); // Create table if needed
-    return maps.map((map) => WeightEntry.fromMap(map)).toList();
-  }
-}
-
 class AppRepository {
   Future<void> saveWaterIntake(WaterIntake intake) async {
     final db = await DatabaseHelper().database;
@@ -115,5 +75,45 @@ class AppRepository {
         time: DateTime.fromMillisecondsSinceEpoch(row['created_at'] as int),
       );
     }).toList();
+  }
+}
+
+extension WeightMethods on AppRepository {
+  Future<void> deleteWeightEntry(WeightEntry entry) async {
+    final db = await DatabaseHelper().database;
+
+    await db.delete(
+      'weight_entries',
+      where: 'date = ?',
+      whereArgs: [entry.date.millisecondsSinceEpoch],
+    );
+  }
+
+  Future<void> updateWeightEntry(WeightEntry entry, double newWeight) async {
+    final db = await DatabaseHelper().database;
+
+    await db.update(
+      'weight_entries',
+      {'weight': newWeight},
+      where: 'date = ?',
+      whereArgs: [entry.date.millisecondsSinceEpoch],
+    );
+  }
+
+  Future<void> saveWeightEntry(WeightEntry entry) async {
+    final db = await DatabaseHelper().database;
+    await db.insert('weight_entries', {
+      'weight': entry.weight,
+      'date': entry.date.millisecondsSinceEpoch,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<List<WeightEntry>> getAllWeightEntries() async {
+    final db = await DatabaseHelper().database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'weight_entries',
+      orderBy: 'date DESC',
+    ); // Create table if needed
+    return maps.map((map) => WeightEntry.fromMap(map)).toList();
   }
 }

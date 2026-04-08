@@ -6,7 +6,7 @@ import 'package:ai_calorie_counter/Components/water_card.dart';
 import 'package:ai_calorie_counter/constants.dart';
 import 'package:ai_calorie_counter/models/ai_log_entry.dart';
 import 'package:ai_calorie_counter/repository/app_repository.dart';
-import 'package:ai_calorie_counter/weight_tracker_screen.dart';
+import 'package:ai_calorie_counter/screens/weight_tracker_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
+    _loadDailyGoalsData();
     _loadBannerAd();
     _loadMeals();
   }
@@ -39,6 +39,43 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     _bannerAd?.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadDailyGoalsData() async {
+    final repo = AppRepository();
+
+    final calories = await repo.getAppData("daily_calories");
+    final carbs = await repo.getAppData("daily_carbs");
+    final protein = await repo.getAppData("daily_protein");
+    final fat = await repo.getAppData("daily_fat");
+    final carbPercentage = await repo.getAppData("carbs_percentage");
+    final proteinPercentage = await repo.getAppData("protein_percentage");
+    final fatPercentage = await repo.getAppData("fat_percentage");
+
+    if (calories != null) {
+      Constants.setDailyCalories(int.parse(calories));
+    }
+
+    if (carbs != null) {
+      Constants.setDailyCarbs(int.parse(carbs));
+    }
+
+    if (protein != null) {
+      Constants.setDailyProtein(int.parse(protein));
+    }
+
+    if (fat != null) {
+      Constants.setDailyFat(int.parse(fat));
+    }
+    if (carbPercentage != null) {
+      Constants.setDailyCarbsPercentage(int.parse(carbPercentage));
+    }
+    if (proteinPercentage != null) {
+      Constants.setDailyProteinPercentage(int.parse(proteinPercentage));
+    }
+    if (fatPercentage != null) {
+      Constants.setDailyFatPercentage(int.parse(fatPercentage));
+    }
   }
 
   /// Loads a banner ad.
@@ -74,12 +111,12 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => aiEntries = logs);
   }
 
-  Map<String, double> _dailyTotals() {
-    double foodCalories = 0;
-    double exerciseCalories = 0;
-    double carbs = 0;
-    double protein = 0;
-    double fat = 0;
+  Map<String, int> _dailyTotals() {
+    int foodCalories = 0;
+    int exerciseCalories = 0;
+    int carbs = 0;
+    int protein = 0;
+    int fat = 0;
 
     for (final entry in entriesForSelectedDay) {
       final data = entry.data;
@@ -88,13 +125,13 @@ class _HomeScreenState extends State<HomeScreen> {
       if (type == "meal") {
         final totals = data["totals"] ?? {};
 
-        foodCalories += _toDouble(totals["calories"]);
-        carbs += _toDouble(totals["carbs"]);
-        protein += _toDouble(totals["protein"]);
-        fat += _toDouble(totals["fat"]);
+        foodCalories += _toInt(totals["calories"]);
+        carbs += _toInt(totals["carbs"]);
+        protein += _toInt(totals["protein"]);
+        fat += _toInt(totals["fat"]);
       }
       if (type == "exercise") {
-        exerciseCalories += _toDouble(data["calories_burned"]);
+        exerciseCalories += _toInt(data["calories_burned"]);
       }
     }
     return {
@@ -106,10 +143,10 @@ class _HomeScreenState extends State<HomeScreen> {
     };
   }
 
-  double _toDouble(dynamic v) {
+  int _toInt(dynamic v) {
     if (v == null) return 0;
-    if (v is num) return v.toDouble();
-    return double.tryParse(v.toString()) ?? 0;
+    if (v is num) return v.toInt();
+    return int.tryParse(v.toString()) ?? 0;
   }
 
   List<AILogEntry> get entriesForSelectedDay {
@@ -192,13 +229,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton(
                   icon: const Icon(Icons.chevron_left),
                   onPressed: () {
-                    // if (_isToday) {
                     setState(() {
                       selectedDate = selectedDate.subtract(
                         const Duration(days: 1),
                       );
                     });
-                    // }
                   },
                 ),
                 GestureDetector(

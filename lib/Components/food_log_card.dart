@@ -19,10 +19,10 @@ class FoodLogCard extends StatelessWidget {
     final items = (entry.data["items"] as List?) ?? const [];
     final totals = (entry.data["totals"] as Map?) ?? const {};
 
-    final totalCalories = _toDouble(totals["calories"]);
-    final totalCarbs = _toDouble(totals["carbs"]);
-    final totalProtein = _toDouble(totals["protein"]);
-    final totalFat = _toDouble(totals["fat"]);
+    final int totalCalories = _toDouble(totals["calories"]);
+    final int totalCarbs = _toDouble(totals["carbs"]);
+    final int totalProtein = _toDouble(totals["protein"]);
+    final int totalFat = _toDouble(totals["fat"]);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -69,7 +69,7 @@ class FoodLogCard extends StatelessWidget {
               Expanded(
                 child: _MacroTotalCompact(
                   label: "Calories",
-                  valueText: _formatInt(totalCalories),
+                  valueText: totalCalories.toString(),
                   percentText: _percentText(
                     totalCalories,
                     Constants.getDailyCalories(),
@@ -85,7 +85,7 @@ class FoodLogCard extends StatelessWidget {
               Expanded(
                 child: _MacroTotalCompact(
                   label: "Carbs",
-                  valueText: "${_formatInt(totalCarbs)}g",
+                  valueText: "${totalCarbs}g",
                   percentText: _percentText(
                     totalCarbs,
                     Constants.getDailyCarbs(),
@@ -98,7 +98,7 @@ class FoodLogCard extends StatelessWidget {
               Expanded(
                 child: _MacroTotalCompact(
                   label: "Protein",
-                  valueText: "${_formatInt(totalProtein)}g",
+                  valueText: "${totalProtein}g",
                   percentText: _percentText(
                     totalProtein,
                     Constants.getDailyProtein(),
@@ -114,7 +114,7 @@ class FoodLogCard extends StatelessWidget {
               Expanded(
                 child: _MacroTotalCompact(
                   label: "Fat",
-                  valueText: "${_formatInt(totalFat)}g",
+                  valueText: "${totalFat}g",
                   percentText: _percentText(totalFat, Constants.getDailyFat()),
                   progress: _progress(totalFat, Constants.getDailyFat()),
                   color: _MacroColors.fat,
@@ -134,20 +134,18 @@ class FoodLogCard extends StatelessWidget {
     );
   }
 
-  static double _toDouble(dynamic v) {
+  static int _toDouble(dynamic v) {
     if (v == null) return 0;
-    if (v is num) return v.toDouble();
-    return double.tryParse(v.toString()) ?? 0;
+    if (v is num) return v.toInt();
+    return int.tryParse(v.toString()) ?? 0;
   }
 
-  static String _formatInt(double v) => v.round().toString();
-
-  static double _progress(double value, double max) {
+  static double _progress(int value, int max) {
     if (max <= 0) return 0;
     return (value / max).clamp(0.0, 1.0);
   }
 
-  static String _percentText(double value, double max) {
+  static String _percentText(int value, int max) {
     if (max <= 0) return "0%";
     return "${(value / max * 100).round()}%";
   }

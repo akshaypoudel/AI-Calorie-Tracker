@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:ai_calorie_counter/constants.dart';
 
 class DailySummaryCard extends StatelessWidget {
-  final double food;
-  final double exercise;
-  final double remaining;
+  final int food;
+  final int exercise;
+  final int remaining;
 
-  final double carbs;
-  final double protein;
-  final double fat;
+  final int carbs;
+  final int protein;
+  final int fat;
 
   const DailySummaryCard({
     super.key,
@@ -233,7 +233,7 @@ class _AccentIcon extends StatelessWidget {
 
 /// Calories tile: stacked value then label, smaller + cleaner.
 class _CalTile extends StatelessWidget {
-  final double value;
+  final int value;
   final String label;
   final bool emphasize;
 
@@ -294,8 +294,8 @@ class _CalTile extends StatelessWidget {
 
 class _MacroRow extends StatelessWidget {
   final String label;
-  final double value;
-  final double goal;
+  final int value;
+  final int goal;
   final Color color;
 
   const _MacroRow({
