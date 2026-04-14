@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ai_calorie_counter/constants.dart';
+import 'package:provider/provider.dart';
 
 class DailySummaryCard extends StatelessWidget {
   final int food;
@@ -24,6 +25,7 @@ class DailySummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const gap = 5.0;
+    final provider = Provider.of<Constants>(context, listen: true);
 
     return IntrinsicHeight(
       child: Row(
@@ -65,21 +67,21 @@ class DailySummaryCard extends StatelessWidget {
                 _MacroRow(
                   label: "Carbs",
                   value: carbs,
-                  goal: Constants.getDailyCarbs(),
+                  goal: provider.getDailyCarbs,
                   color: const Color(0xFF2563EB),
                 ),
                 const SizedBox(height: 10),
                 _MacroRow(
                   label: "Protein",
                   value: protein,
-                  goal: Constants.getDailyProtein(),
+                  goal: provider.getDailyProtein,
                   color: const Color(0xFF16A34A),
                 ),
                 const SizedBox(height: 10),
                 _MacroRow(
                   label: "Fat",
                   value: fat,
-                  goal: Constants.getDailyFat(),
+                  goal: provider.getDailyFat,
                   color: const Color(0xFFF97316),
                 ),
               ],

@@ -1,6 +1,7 @@
 import 'package:ai_calorie_counter/constants.dart';
 import 'package:ai_calorie_counter/repository/app_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DailyGoalsScreen extends StatefulWidget {
   const DailyGoalsScreen({super.key});
@@ -21,17 +22,27 @@ class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
   int fatCaloriePerGram = 9;
   int proteinCalorePerGram = 4;
   AppRepository repo = AppRepository();
+  bool _isInit = false;
 
   @override
-  void initState() {
-    super.initState();
-    calories = Constants.getDailyCalories();
-    carbsValue = Constants.getDailyCarbs();
-    proteinValue = Constants.getDailyProtein();
-    fatValue = Constants.getDailyFat();
-    carbsPercentage = Constants.getDailyCarbsPercentage();
-    fatPercentage = Constants.getDailyFatPercentage();
-    proteinPercentage = Constants.getDailyProteinPercentage();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_isInit) {
+      initializeData();
+      _isInit = true;
+    }
+  }
+
+  void initializeData() {
+    final provider = Provider.of<Constants>(context, listen: true);
+    calories = provider.getDailyCalories;
+    carbsValue = provider.getDailyCarbs;
+    proteinValue = provider.getDailyProtein;
+    fatValue = provider.getDailyFat;
+    carbsPercentage = provider.getDailyCarbsPercentage;
+    fatPercentage = provider.getDailyFatPercentage;
+    proteinPercentage = provider.getDailyProteinPercentage;
   }
 
   void _openMacroEditor(String type) {
@@ -299,7 +310,8 @@ class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
 
   Future<void> _onCaloriesSaved(int value) async {
     setState(() => calories = value);
-    Constants.setDailyCalories(value);
+    // Constants.setDailyCalories(value);
+    Provider.of<Constants>(context, listen: false).setDailyCalories(value);
 
     await saveDailyGoalsAfterCaloriesValueChange(value);
   }
@@ -323,9 +335,11 @@ class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
       fatValue = fat;
     });
 
-    Constants.setDailyCarbs(carbs);
-    Constants.setDailyProtein(protein);
-    Constants.setDailyFat(fat);
+    final provider = Provider.of<Constants>(context, listen: false);
+
+    provider.setDailyCarbs(carbs);
+    provider.setDailyProtein(protein);
+    provider.setDailyFat(fat);
     await repo.saveAppData("daily_carbs", carbs.toString());
     await repo.saveAppData("daily_protein", protein.toString());
     await repo.saveAppData("daily_fat", fat.toString());
@@ -336,9 +350,11 @@ class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
     int proteinPercent,
     int fatPercent,
   ) async {
-    Constants.setDailyCarbsPercentage(carbPercent);
-    Constants.setDailyProteinPercentage(proteinPercent);
-    Constants.setDailyFatPercentage(fatPercent);
+    final provider = Provider.of<Constants>(context, listen: false);
+
+    provider.setDailyCarbsPercentage(carbPercent);
+    provider.setDailyProteinPercentage(proteinPercent);
+    provider.setDailyFatPercentage(fatPercent);
     await repo.saveAppData("carbs_percentage", carbPercent.toString());
     await repo.saveAppData("protein_percentage", proteinPercent.toString());
     await repo.saveAppData("fat_percentage", fatPercent.toString());

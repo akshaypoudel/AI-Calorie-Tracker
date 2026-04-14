@@ -67,7 +67,7 @@ class AppDrawer extends StatelessWidget {
                     Icons.privacy_tip_outlined,
                     AppDrawerPages.termsAndPrivacy,
                   ),
-                  _drawerItem(Icons.settings_outlined, AppDrawerPages.settings),
+                  //_drawerItem(Icons.settings_outlined, AppDrawerPages.settings),
                 ],
               ),
             ),

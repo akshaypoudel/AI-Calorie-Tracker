@@ -12,6 +12,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.adSize = AdSize.banner});
@@ -26,13 +27,28 @@ class _HomeScreenState extends State<HomeScreen> {
   AppRepository repo = AppRepository();
   DateTime selectedDate = DateTime.now();
   BannerAd? _bannerAd;
+  late Map<String, int> totalMacros;
+  bool _isInit = false;
 
   @override
   void initState() {
     super.initState();
-    _loadDailyGoalsData();
+    initializeData();
+  }
+
+  Future<void> initializeData() async {
     _loadBannerAd();
-    _loadMeals();
+    await _loadMeals();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_isInit) {
+      _loadDailyGoalsData();
+      _isInit = true;
+    }
   }
 
   @override
@@ -42,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadDailyGoalsData() async {
+    final provider = Provider.of<Constants>(context, listen: false);
     final repo = AppRepository();
 
     final calories = await repo.getAppData("daily_calories");
@@ -53,28 +70,28 @@ class _HomeScreenState extends State<HomeScreen> {
     final fatPercentage = await repo.getAppData("fat_percentage");
 
     if (calories != null) {
-      Constants.setDailyCalories(int.parse(calories));
+      provider.setDailyCalories(int.parse(calories));
     }
 
     if (carbs != null) {
-      Constants.setDailyCarbs(int.parse(carbs));
+      provider.setDailyCarbs(int.parse(carbs));
     }
 
     if (protein != null) {
-      Constants.setDailyProtein(int.parse(protein));
+      provider.setDailyProtein(int.parse(protein));
     }
 
     if (fat != null) {
-      Constants.setDailyFat(int.parse(fat));
+      provider.setDailyFat(int.parse(fat));
     }
     if (carbPercentage != null) {
-      Constants.setDailyCarbsPercentage(int.parse(carbPercentage));
+      provider.setDailyCarbsPercentage(int.parse(carbPercentage));
     }
     if (proteinPercentage != null) {
-      Constants.setDailyProteinPercentage(int.parse(proteinPercentage));
+      provider.setDailyProteinPercentage(int.parse(proteinPercentage));
     }
     if (fatPercentage != null) {
-      Constants.setDailyFatPercentage(int.parse(fatPercentage));
+      provider.setDailyFatPercentage(int.parse(fatPercentage));
     }
   }
 
@@ -211,13 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final totals = _dailyTotals();
-
-    final remaining =
-        Constants.getDailyCalories() -
-        totals["foodCalories"]! +
-        totals["exerciseCalories"]!;
-
+    totalMacros = _dailyTotals();
+    final calorieProvider = Provider.of<Constants>(context, listen: true);
     return Scaffold(
       drawer: AppDrawer(),
       appBar: AppBar(
@@ -286,12 +298,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView(
                   children: [
                     DailySummaryCard(
-                      food: totals["foodCalories"]!,
-                      carbs: totals["carbs"]!,
-                      protein: totals['protein']!,
-                      fat: totals['fat']!,
-                      exercise: totals["exerciseCalories"]!,
-                      remaining: remaining,
+                      food: totalMacros["foodCalories"]!,
+                      carbs: totalMacros["carbs"]!,
+                      protein: totalMacros['protein']!,
+                      fat: totalMacros['fat']!,
+                      exercise: totalMacros["exerciseCalories"]!,
+                      remaining:
+                          calorieProvider.getDailyCalories -
+                          totalMacros["foodCalories"]! +
+                          totalMacros["exerciseCalories"]!,
                     ),
 
                     const SizedBox(height: 5),

@@ -2,6 +2,7 @@ import 'package:ai_calorie_counter/constants.dart';
 import 'package:ai_calorie_counter/models/ai_log_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class FoodLogCard extends StatelessWidget {
   final AILogEntry entry;
@@ -23,6 +24,8 @@ class FoodLogCard extends StatelessWidget {
     final int totalCarbs = _toDouble(totals["carbs"]);
     final int totalProtein = _toDouble(totals["protein"]);
     final int totalFat = _toDouble(totals["fat"]);
+
+    final provider = Provider.of<Constants>(context, listen: true);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -72,12 +75,9 @@ class FoodLogCard extends StatelessWidget {
                   valueText: totalCalories.toString(),
                   percentText: _percentText(
                     totalCalories,
-                    Constants.getDailyCalories(),
+                    provider.getDailyCalories,
                   ),
-                  progress: _progress(
-                    totalCalories,
-                    Constants.getDailyCalories(),
-                  ),
+                  progress: _progress(totalCalories, provider.getDailyCalories),
                   color: _MacroColors.calories,
                 ),
               ),
@@ -86,11 +86,8 @@ class FoodLogCard extends StatelessWidget {
                 child: _MacroTotalCompact(
                   label: "Carbs",
                   valueText: "${totalCarbs}g",
-                  percentText: _percentText(
-                    totalCarbs,
-                    Constants.getDailyCarbs(),
-                  ),
-                  progress: _progress(totalCarbs, Constants.getDailyCarbs()),
+                  percentText: _percentText(totalCarbs, provider.getDailyCarbs),
+                  progress: _progress(totalCarbs, provider.getDailyCarbs),
                   color: _MacroColors.carbs,
                 ),
               ),
@@ -101,12 +98,9 @@ class FoodLogCard extends StatelessWidget {
                   valueText: "${totalProtein}g",
                   percentText: _percentText(
                     totalProtein,
-                    Constants.getDailyProtein(),
+                    provider.getDailyProtein,
                   ),
-                  progress: _progress(
-                    totalProtein,
-                    Constants.getDailyProtein(),
-                  ),
+                  progress: _progress(totalProtein, provider.getDailyProtein),
                   color: _MacroColors.protein,
                 ),
               ),
@@ -115,8 +109,8 @@ class FoodLogCard extends StatelessWidget {
                 child: _MacroTotalCompact(
                   label: "Fat",
                   valueText: "${totalFat}g",
-                  percentText: _percentText(totalFat, Constants.getDailyFat()),
-                  progress: _progress(totalFat, Constants.getDailyFat()),
+                  percentText: _percentText(totalFat, provider.getDailyFat),
+                  progress: _progress(totalFat, provider.getDailyFat),
                   color: _MacroColors.fat,
                 ),
               ),

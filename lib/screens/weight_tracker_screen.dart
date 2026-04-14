@@ -4,6 +4,7 @@ import 'package:ai_calorie_counter/repository/app_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 BoxDecoration _softCardDecoration({required ColorScheme cs, Color? tint}) {
   final base = tint ?? Colors.white;
@@ -142,7 +143,7 @@ class WeightTrackerScreen extends StatefulWidget {
 }
 
 class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
-  double currentWeight = 105.1;
+  double currentWeight = 0;
   List<WeightEntry> entries = [];
   int selectedTabIndex = 0;
   final TextEditingController _weightController = TextEditingController();
@@ -224,6 +225,8 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
   }
 
   Widget _statsRow(ColorScheme cs) {
+    final provider = Provider.of<Constants>(context, listen: true);
+
     return Row(
       children: [
         Expanded(
@@ -247,16 +250,16 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
         Expanded(
           child: GestureDetector(
             onTap: () => _showEditWeightDialog(
-              Constants.getTargetWeight(),
+              provider.getTargetWeight,
               "Target Weight",
               (newVal) {
-                setState(() => Constants.setTargetWeight(newVal));
+                setState(() => provider.setTargetWeight(newVal));
                 _repo.saveAppData('target_weight', newVal.toString());
               },
             ),
             child: _StatCard(
               title: "Target Weight",
-              value: "${Constants.getTargetWeight().toStringAsFixed(1)} kg",
+              value: "${provider.getTargetWeight.toStringAsFixed(1)} kg",
               accent: const Color(0xFF16A34A), // soft green
             ),
           ),
@@ -266,6 +269,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
   }
 
   Widget _weightChart() {
+    final provider = Provider.of<Constants>(context, listen: false);
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
@@ -298,11 +302,11 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
 
     final combinedMin = [
       minWeight,
-      Constants.getTargetWeight(),
+      provider.getTargetWeight,
     ].reduce((a, b) => a < b ? a : b);
     final combinedMax = [
       maxWeight,
-      Constants.getTargetWeight(),
+      provider.getTargetWeight,
     ].reduce((a, b) => a > b ? a : b);
 
     final chartMinY = roundDownTo10(combinedMin);
@@ -358,8 +362,9 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
                   final index = value.toInt();
-                  if (index < 0 || index >= data.length)
+                  if (index < 0 || index >= data.length) {
                     return const SizedBox();
+                  }
 
                   int step;
                   if (selectedTabIndex == 0) {
@@ -415,11 +420,8 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
             // Target line (dashed feel using transparency + thinner bar).
             LineChartBarData(
               spots: [
-                FlSpot(0, Constants.getTargetWeight()),
-                FlSpot(
-                  (data.length - 1).toDouble(),
-                  Constants.getTargetWeight(),
-                ),
+                FlSpot(0, provider.getTargetWeight),
+                FlSpot((data.length - 1).toDouble(), provider.getTargetWeight),
               ],
               isCurved: false,
               color: const Color(0xFF16A34A),
