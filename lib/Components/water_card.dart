@@ -1,13 +1,20 @@
 import 'dart:developer';
 
 import 'package:ai_calorie_counter/Components/card_wrapper.dart';
+import 'package:ai_calorie_counter/constants.dart';
 import 'package:ai_calorie_counter/models/water_intake.dart';
 import 'package:ai_calorie_counter/repository/app_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class WaterCard extends StatefulWidget {
-  const WaterCard({super.key, required this.selectedDate});
+  const WaterCard({
+    super.key,
+    required this.selectedDate,
+    required this.waterCups,
+  });
   final DateTime selectedDate;
+  final int waterCups;
   @override
   State<WaterCard> createState() => WaterCardState();
 }
@@ -15,16 +22,24 @@ class WaterCard extends StatefulWidget {
 class WaterCardState extends State<WaterCard> {
   bool _isExpanded = false;
   int cups = 0;
-  static const double cupMl = 300.0;
-  static const double goalL = 4.0;
+  static const double cupMl = 250;
+  double goalL = 2;
+  bool isinit = true;
 
   final AppRepository _repo = AppRepository();
 
   @override
   void initState() {
     super.initState();
-    log('water date ------ ${widget.selectedDate}');
     loadData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final provider = Provider.of<Constants>(context, listen: true);
+    final requiredWater = provider.getWaterCups.toDouble();
+    goalL = (requiredWater * cupMl) / 1000;
   }
 
   @override
@@ -32,10 +47,9 @@ class WaterCardState extends State<WaterCard> {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.selectedDate != widget.selectedDate) {
-      log('Date changed → reload water data');
-
       loadData(); // 🔥 THIS is the fix
     }
+    loadData();
   }
 
   void _toggleExpanded() {
@@ -65,6 +79,10 @@ class WaterCardState extends State<WaterCard> {
 
     final intake = await _repo.getWaterIntake(date);
 
+    log('goal litereererelllll ---- $goalL');
+    final requiredWater = widget.waterCups.toDouble();
+    goalL = (requiredWater * cupMl) / 1000;
+
     if (intake != null) {
       setState(() {
         cups = intake.cups;
@@ -74,13 +92,14 @@ class WaterCardState extends State<WaterCard> {
         cups = 0;
       });
     }
+    setState(() {});
   }
 
   Future<void> saveData() async {
-    // final today = DateTime.now().toIso8601String().split('T')[0];
     final date = widget.selectedDate.toIso8601String().split('T')[0];
     final intake = WaterIntake(date: date, cups: cups);
     await _repo.saveWaterIntake(intake);
+    setState(() {});
   }
 
   double get totalL => (cups * cupMl / 1000.0);
@@ -170,11 +189,11 @@ class WaterCardState extends State<WaterCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("${(progress * 100).toStringAsFixed(0)}% to 4L goal"),
+                  Text(
+                    "${(progress * 100).toStringAsFixed(0)}% to ${formatLiters(goalL)}L goal",
+                  ),
                   (goalL - totalL > 0)
-                      ? Text(
-                          "${(goalL - totalL).toStringAsFixed(1)}L remaining",
-                        )
+                      ? Text("${formatLiters((goalL - totalL))}L remaining")
                       : Text(
                           'Goal Achieved 🎉',
                           style: const TextStyle(
@@ -189,5 +208,15 @@ class WaterCardState extends State<WaterCard> {
         ),
       ),
     );
+  }
+
+  String formatLiters(double value) {
+    if (value % 1 == 0) {
+      return value.toStringAsFixed(0); // 2
+    } else if ((value * 10) % 1 == 0) {
+      return value.toStringAsFixed(1); // 2.5
+    } else {
+      return value.toStringAsFixed(2); // 2.25
+    }
   }
 }

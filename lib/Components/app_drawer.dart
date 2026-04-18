@@ -10,7 +10,7 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 enum AppDrawerPages {
   dailyGoals("Daily Goals", DailyGoalsScreen()),
   weightTracker("Weight Tracker", WeightTrackerScreen()),
-  waterTracker("Water Tracker", WaterTrackerGoalScreen()),
+  waterTracker("Water Tracker", WaterTrackerScreen()),
   termsAndPrivacy("Terms & Privacy", TermsAndPrivacyScreen()),
   settings("Settings", SettingsScreen());
 
@@ -36,7 +36,7 @@ class AppDrawer extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 children: [
-                  Icon(Icons.favorite, color: Colors.blue, size: 28),
+                  Icon(Icons.favorite, color: Colors.orangeAccent, size: 28),
                   const SizedBox(width: 10),
                   const Text(
                     "Do It Health Tracker",
@@ -62,15 +62,19 @@ class AppDrawer extends StatelessWidget {
                     Icons.water_drop_outlined,
                     AppDrawerPages.waterTracker,
                   ),
-                  const SizedBox(height: 20),
-                  _drawerItem(
-                    Icons.privacy_tip_outlined,
-                    AppDrawerPages.termsAndPrivacy,
-                  ),
+
                   //_drawerItem(Icons.settings_outlined, AppDrawerPages.settings),
                 ],
               ),
             ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: _drawerItem(
+                Icons.privacy_tip_outlined,
+                AppDrawerPages.termsAndPrivacy,
+              ),
+            ),
+            const SizedBox(height: 30),
           ],
         ),
       ),

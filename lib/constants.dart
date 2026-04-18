@@ -6,6 +6,7 @@ class Constants extends ChangeNotifier {
   static final String API_KEY2 = dotenv.env['API_KEY2'] ?? '';
 
   static final String BANNER_AD_ID = dotenv.env['BANNER_AD_ID'] ?? '';
+  static final String TEST_BANNER_AD_ID = dotenv.env['TEST_BANNER_AD_ID'] ?? '';
   static final String INTERESTIAL_AD_ID = dotenv.env['INTERESTIAL_AD_ID'] ?? '';
   static final String REWARD_AD_ID = dotenv.env['REWARD_AD_ID'] ?? '';
 
@@ -18,7 +19,25 @@ class Constants extends ChangeNotifier {
   int _dailyProteinPercentage = 25;
   int _dailyFatPercentage = 25;
 
+  int _waterCups = 8;
+
   double _targetWeight = 85;
+
+  bool _canShowWaterTracker = true;
+
+  void setWaterCups(int value) {
+    _waterCups = value;
+    notifyListeners();
+  }
+
+  int get getWaterCups => _waterCups;
+
+  void setWaterTrackerStatus(bool canShow) {
+    _canShowWaterTracker = canShow;
+    notifyListeners();
+  }
+
+  bool get getShowWaterTracker => _canShowWaterTracker;
 
   void setTargetWeight(double weight) {
     _targetWeight = weight;

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:ai_calorie_counter/Components/app_drawer.dart';
 import 'package:ai_calorie_counter/Components/daily_summary_card.dart';
 import 'package:ai_calorie_counter/Components/food_log_card.dart';
@@ -28,12 +30,16 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime selectedDate = DateTime.now();
   BannerAd? _bannerAd;
   late Map<String, int> totalMacros;
+  int waterCups = 8;
   bool _isInit = false;
 
   @override
   void initState() {
     super.initState();
     initializeData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadDailyGoalsData();
+    });
   }
 
   Future<void> initializeData() async {
@@ -68,6 +74,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final carbPercentage = await repo.getAppData("carbs_percentage");
     final proteinPercentage = await repo.getAppData("protein_percentage");
     final fatPercentage = await repo.getAppData("fat_percentage");
+    final waterTrackerStatus = await repo.getAppData('water_tracker_status');
+    final waterCups = await repo.getAppData('water_cups');
+    final targetWeight = await repo.getAppData('target_weight');
+    log('water cups ------ $waterCups');
 
     if (calories != null) {
       provider.setDailyCalories(int.parse(calories));
@@ -93,6 +103,20 @@ class _HomeScreenState extends State<HomeScreen> {
     if (fatPercentage != null) {
       provider.setDailyFatPercentage(int.parse(fatPercentage));
     }
+    if (waterTrackerStatus != null) {
+      bool status = (waterTrackerStatus == 'true') ? true : false;
+      provider.setWaterTrackerStatus(status);
+    }
+    if (waterCups != null) {
+      provider.setWaterCups(int.parse(waterCups));
+    }
+    if (targetWeight != null) {
+      provider.setTargetWeight(double.parse(targetWeight));
+    }
+
+    // if (mounted) {
+    setState(() {});
+    // }
   }
 
   /// Loads a banner ad.
@@ -310,7 +334,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     const SizedBox(height: 5),
-                    WaterCard(selectedDate: selectedDate),
+                    (calorieProvider.getShowWaterTracker)
+                        ? WaterCard(
+                            selectedDate: selectedDate,
+                            waterCups: calorieProvider.getWaterCups,
+                          )
+                        : SizedBox.shrink(),
                     const SizedBox(height: 5),
                     ...entriesForSelectedDay.map((e) => FoodLogCard(entry: e)),
                   ],
